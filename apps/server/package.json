@@ -12,10 +12,15 @@
   "dependencies": {
     "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "express": "^5.1.0"
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.6.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.15.3",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
