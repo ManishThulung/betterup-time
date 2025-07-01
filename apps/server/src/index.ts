@@ -36,6 +36,7 @@ app.post("/api/auth/signup", async (req: Request, res: Response) => {
 
     if (error.code === "P2002" && error.meta?.target?.includes("email")) {
       res.status(409).json({ error: "Email already in use" });
+      return;
     }
 
     res.status(500).json({ error: "Internal server error" });
@@ -104,7 +105,7 @@ app.post("/api/website", authentication, async (req: any, res: Response) => {
         userId: req?.userId.toString(),
       },
     });
-    res.status(201).json(website);
+    res.status(201).json({ data: website });
     return;
   } catch (error: any) {
     console.error("Error creating website:", error);
@@ -116,6 +117,7 @@ app.get("/api/website/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!id) {
     res.status(400).json({ error: "Website ID is required" });
+    return;
   }
   try {
     const website = await prismaClient.website.findUnique({
@@ -125,7 +127,7 @@ app.get("/api/website/:id", async (req: Request, res: Response) => {
       res.status(404).json({ error: "Website not found" });
       return;
     }
-    res.status(200).json(website);
+    res.status(200).json({ data: website });
   } catch (error) {
     console.error("Error fetching website:", error);
     res.status(500).json({ error: "Internal server error" });
