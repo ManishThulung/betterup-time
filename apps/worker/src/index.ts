@@ -18,6 +18,7 @@ async function main() {
       }
     );
     console.log(JSON.stringify(response), "response");
+    // const websites = response.messages.
     client.destroy();
   } catch (error) {
     console.log(error, "error while pushing website to worker queue");

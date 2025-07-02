@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "exports": {
-    "./prismaClient": "./src/index.ts"
+    "./prismaClient": "./src/index.ts",
+    "./prisma/client": "./src/client/index.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

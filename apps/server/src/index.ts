@@ -1,18 +1,28 @@
-import { authentication } from "./middleware/authentication";
+import { authenticated } from "./middleware/authenticated";
 import { prismaClient } from "@repo/db/prismaClient";
 import express, { Request, Response } from "express";
 import { compareData, hashData } from "./hash";
 import { configDotenv } from "dotenv";
 import { signJwtToken } from "./jwt";
+import cors from "cors";
+import { authorized } from "./middleware/authorized";
+import { UserRole } from "@repo/db/prisma/client";
 
 configDotenv();
 
 const app = express();
 const PORT = 4000;
 
+const corsOptions = {
+  origin: ["http://localhost:3000", "http://127.0.0.1:3001"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-app.post("/api/auth/signup", async (req: Request, res: Response) => {
+app.post("/api/auth/sign-up", async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
   if (!email || !password || !name) {
     res.status(400).json({ error: "Missing required fields" });
@@ -43,7 +53,7 @@ app.post("/api/auth/signup", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/api/auth/signin", async (req: Request, res: Response) => {
+app.post("/api/auth/sign-in", async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password) {
     res.status(400).json({ error: "Missing required fields" });
@@ -67,11 +77,13 @@ app.post("/api/auth/signin", async (req: Request, res: Response) => {
       return;
     }
 
-    const token = signJwtToken(user.id);
+    const token = signJwtToken(user.id, user.role);
 
-    res
-      .status(200)
-      .json({ message: "User signin successfully", data: { token } });
+    res.status(200).json({
+      success: true,
+      message: "User signin successfully",
+      data: { token },
+    });
     return;
   } catch (error: any) {
     console.error("Error signin user:", error);
@@ -95,14 +107,14 @@ app.get("/api/users", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/api/website", authentication, async (req: any, res: Response) => {
+app.post("/api/website", authenticated, async (req: any, res: Response) => {
   const { url, title } = req.body;
   try {
     const website = await prismaClient.website.create({
       data: {
         url,
         title,
-        userId: req?.userId.toString(),
+        userId: req?.user.userId.toString(),
       },
     });
     res.status(201).json({ data: website });
@@ -112,6 +124,41 @@ app.post("/api/website", authentication, async (req: any, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+app.get("/api/website", authenticated, async (req: any, res: Response) => {
+  try {
+    const websites = await prismaClient.website.findMany({
+      where: {
+        userId: req?.user.userId.toString(),
+      },
+    });
+    res.status(200).json({ data: websites });
+    return;
+  } catch (error: any) {
+    console.error("Error getting website:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get(
+  "/api/admin/website",
+  authenticated,
+  authorized([UserRole.ADMIN]),
+  async (req: any, res: Response) => {
+    try {
+      const websites = await prismaClient.website.findMany({
+        include: {
+          user: { select: { id: true, name: true } },
+        },
+      });
+      res.status(200).json({ data: websites });
+      return;
+    } catch (error: any) {
+      console.error("Error getting website:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
 
 app.get("/api/website/:id", async (req: Request, res: Response) => {
   const { id } = req.params;

@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { verifyJwtToken } from "../jwt";
 
-export const authentication = (
+export const authenticated = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const token = req.headers.authorization;
+    const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
       throw new Error("Authentication failed");
     }
@@ -18,7 +18,7 @@ export const authentication = (
 
     if ((decoded as any).userId) {
       // @ts-ignore
-      req.userId = (decoded as any).userId as string;
+      req.user = decoded;
       next();
     } else {
       throw new Error("Internal server error");
