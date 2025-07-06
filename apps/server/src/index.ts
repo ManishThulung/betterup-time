@@ -169,6 +169,23 @@ app.get("/api/website/:id", async (req: Request, res: Response) => {
   try {
     const website = await prismaClient.website.findUnique({
       where: { id },
+      select: {
+        id: true,
+        title: true,
+        url: true,
+        createdAt: true,
+        ticks: {
+          select: {
+            id: true,
+            checkedAt: true,
+            responseTimeMs: true,
+            status: true,
+            region: { select: { name: true } },
+          },
+          take: 10, // Limit to the last 10 ticks
+          orderBy: { checkedAt: "desc" }, // Order by checkedAt in descending
+        },
+      },
     });
     if (!website) {
       res.status(404).json({ error: "Website not found" });
@@ -180,6 +197,48 @@ app.get("/api/website/:id", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+app.get(
+  "/api/region",
+  authenticated,
+  authorized([UserRole.ADMIN]),
+
+  async (req: Request, res: Response) => {
+    try {
+      const regions = await prismaClient.region.findMany();
+
+      if (!regions) {
+        res.status(404).json({ error: "regions not found" });
+      }
+
+      res.status(200).json(regions);
+    } catch (error) {
+      console.error("Error fetching regions:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
+
+app.post(
+  "/api/region",
+  authenticated,
+  authorized([UserRole.ADMIN]),
+  async (req: any, res: Response) => {
+    const { name } = req.body;
+    try {
+      const region = await prismaClient.region.create({
+        data: {
+          name,
+        },
+      });
+      res.status(201).json({ data: region });
+      return;
+    } catch (error: any) {
+      console.error("Error creating region:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
