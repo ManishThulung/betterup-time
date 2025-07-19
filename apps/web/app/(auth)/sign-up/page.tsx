@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@repo/web/components/ui/button";
 import { api } from "@repo/web/config/http-request";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 const Page = () => {
   const router = useRouter();
@@ -17,12 +18,18 @@ const Page = () => {
 
     const formData = new FormData(event.currentTarget);
     const username = formData.get("username");
+    const email = formData.get("email");
     const password = formData.get("password");
 
     try {
-      const res = await api.post("/sign-up", { username, password });
+      const res = await api.post("/auth/sign-up", {
+        email,
+        password,
+        name: username,
+      });
 
       if (res.data.success) {
+        toast.success("Registration successful, Please login now.");
         router.push("/auth/signin");
       } else {
         setError("Signup failed. Please try again.");
@@ -35,7 +42,7 @@ const Page = () => {
   }
 
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           Sign up for an account
@@ -58,7 +65,26 @@ const Page = () => {
                 id="username"
                 autoComplete="username"
                 required
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
+                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-900"
+            >
+              Email
+            </label>
+            <div className="mt-2">
+              <input
+                type="text"
+                name="email"
+                id="email"
+                autoComplete="email"
+                required
+                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
               />
             </div>
           </div>
@@ -77,7 +103,7 @@ const Page = () => {
                 id="password"
                 autoComplete="current-password"
                 required
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
+                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
               />
             </div>
           </div>
@@ -88,7 +114,7 @@ const Page = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600"
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600"
             >
               {loading ? "Signing up..." : "Sign up"}
             </button>
@@ -97,12 +123,12 @@ const Page = () => {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <a
-            href="/auth/signin"
+          <Link
+            href="/sign-in"
             className="font-semibold text-indigo-600 hover:text-indigo-500"
           >
             Sign in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

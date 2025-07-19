@@ -40,7 +40,9 @@ app.post("/api/auth/sign-up", async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({ message: "User created successfully" });
+    res
+      .status(201)
+      .json({ success: true, message: "User created successfully" });
   } catch (error: any) {
     console.error("Error creating user:", error);
 

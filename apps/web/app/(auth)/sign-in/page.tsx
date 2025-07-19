@@ -2,6 +2,7 @@
 
 import { api } from "@repo/web/config/http-request";
 import { getCookie, setCookie } from "cookies-next/client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -11,8 +12,8 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (token) {
-    router.push("/admin");
+  if (token && token !== "null") {
+    router.push("/user");
   }
   async function signin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,7 +41,7 @@ const Page = () => {
   }
 
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex min-h-screen flex-col justify-center items-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           Sign up for an account
@@ -63,7 +64,7 @@ const Page = () => {
                 id="email"
                 autoComplete="email"
                 required
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
+                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
               />
             </div>
           </div>
@@ -82,7 +83,7 @@ const Page = () => {
                 id="password"
                 autoComplete="current-password"
                 required
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
+                className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-indigo-600 sm:text-sm"
               />
             </div>
           </div>
@@ -93,21 +94,21 @@ const Page = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600"
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-indigo-600"
             >
-              {loading ? "Signing up..." : "Sign up"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
-          Already have an account?{" "}
-          <a
-            href="/auth/signin"
+          Don't have an account?{" "}
+          <Link
+            href="/sign-up"
             className="font-semibold text-indigo-600 hover:text-indigo-500"
           >
-            Sign in
-          </a>
+            Sign up
+          </Link>
         </p>
       </div>
     </div>
