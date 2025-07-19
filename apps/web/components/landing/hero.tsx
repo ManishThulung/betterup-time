@@ -68,15 +68,15 @@ export const Hero = () => {
           {/* Right content - Dashboard preview */}
           <div className="relative lg:ml-8 animate-scale-in">
             <div className="relative">
-              {/* <img
-                src={heroDashboard}
+              <img
+                src={"/hero-dashboard.jpg"}
                 alt="Uptime monitoring dashboard"
                 className="rounded-2xl shadow-card hover:shadow-glow transition-all duration-500 w-full"
-              /> */}
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent rounded-2xl"></div>
 
               {/* Floating status indicators */}
-              <div className="absolute -top-4 -left-4 bg-success text-primary-foreground px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+              <div className="absolute bg-[#16A249] -top-4 -left-4 bg-success text-primary-foreground px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
                 <div className="w-2 h-2 bg-primary-foreground rounded-full animate-pulse"></div>
                 All Systems Online
               </div>

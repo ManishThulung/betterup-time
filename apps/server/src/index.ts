@@ -6,7 +6,7 @@ import { configDotenv } from "dotenv";
 import { signJwtToken } from "./jwt";
 import cors from "cors";
 import { authorized } from "./middleware/authorized";
-import { UserRole } from "@repo/db/prisma/client";
+import { UserRole, WebsiteStatus } from "@repo/db/prisma/client";
 
 configDotenv();
 
@@ -182,16 +182,46 @@ app.get("/api/website/:id", async (req: Request, res: Response) => {
             status: true,
             region: { select: { name: true } },
           },
-          take: 10, // Limit to the last 10 ticks
+          take: 1000, // Limit to the last 10 ticks
           orderBy: { checkedAt: "desc" }, // Order by checkedAt in descending
         },
       },
     });
+
+    const grouped = await prismaClient.websiteTick.groupBy({
+      by: ["status"],
+      where: {
+        websiteId: id,
+      },
+      _count: {
+        _all: true,
+      },
+    });
+
+    let upCount = 0;
+    let totalCount = 0;
+
+    for (const group of grouped) {
+      totalCount += group._count._all;
+      if (group.status === WebsiteStatus.UP) {
+        upCount = group._count._all;
+      }
+    }
+
+    const availability = {
+      count: upCount,
+      percentage: (upCount / totalCount) * 100,
+    };
+    const downtime = {
+      count: totalCount - upCount,
+      percentage: 100 - availability.percentage,
+    };
+
     if (!website) {
       res.status(404).json({ error: "Website not found" });
       return;
     }
-    res.status(200).json({ data: website });
+    res.status(200).json({ data: { website, availability, downtime } });
   } catch (error) {
     console.error("Error fetching website:", error);
     res.status(500).json({ error: "Internal server error" });

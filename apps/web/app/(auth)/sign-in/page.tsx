@@ -28,7 +28,7 @@ const Page = () => {
 
       if (res.data.success) {
         setCookie("token", res.data.data.token);
-        router.push("/admin");
+        router.push("/user");
       } else {
         setError("Signin failed. Please try again.");
       }
