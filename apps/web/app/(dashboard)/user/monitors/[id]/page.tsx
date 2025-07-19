@@ -134,7 +134,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                 <TableHead>Timestamp</TableHead>
                 <TableHead>Region</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Response Time</TableHead>
+                <TableHead>Response Time</TableHead>
                 <TableHead>Check ID</TableHead>
               </TableRow>
             </TableHeader>
@@ -149,7 +149,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                   </TableCell>
                   <TableCell>{item.region.name}</TableCell>
                   <TableCell>{getStatusBadge(item.status)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
                     <span
                       className={`font-mono ${
                         item.responseTimeMs > 1000
@@ -163,7 +163,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                     </span>
                   </TableCell>
                   <TableCell className="font-mono text-sm text-muted-foreground">
-                    {item.id.slice(-8)}
+                    {item.id.slice(-9)}
                   </TableCell>
                 </TableRow>
               ))}
